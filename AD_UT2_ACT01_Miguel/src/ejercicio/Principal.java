@@ -18,7 +18,10 @@ public class Principal {
         Connection conexion = crearConexion();
         crearTabla(conexion);
         insertarUsuario(conexion);
-        mostrarDatos(conexion);
+        insertarUsuarios(conexion);
+        modificarUsuario(conexion);
+        eliminarAlumno(conexion);
+        cerrarConexion(conexion);
 
     } //Fin del main
 
@@ -64,64 +67,114 @@ public class Principal {
     }
 
     private static void insertarUsuario(Connection conexion) throws SQLException {
-        String sql = "INSERT INTO users VALUES(?,?,?,?);";
+        Scanner sc=new Scanner(System.in).useDelimiter("\n");
+        String sql = "INSERT INTO users (username, password, nombre, email) VALUES(?,?,?,?);";
         try {
             PreparedStatement ps = conexion.prepareStatement(sql);
-
-            ps.setString(1, "user1");
-            ps.setString(2, "contra1");
-            ps.setString(3, "Paco");
-            ps.setString(4, "paco@gmail.com");
-
-            ps.executeUpdate();
-            System.out.println("Se ha insertado el usuario correctamente");
-        } catch (Exception e) {
-            System.out.println("Seha producido un error" + e.getMessage());
-        }
-
-    }
-
-    private static void insertarAlumnoDatosConsola(Connection conexion) throws SQLException {
-        Scanner sc = new Scanner(System.in).useDelimiter("\n");
-        String sql = "INSERT INTO users (username, password, nombre, email) VALUES(?,?,?,?);";
-        PreparedStatement ps = conexion.prepareStatement(sql);
-
-        for (int i = 0; i < 4; i++) {
-            System.out.println("Introduzca el nombre de usuario:");
+            System.out.println("Introduzca el nombre de usuario: ");
             ps.setString(1, sc.next());
-            System.out.println("Introduzca la contraseña:");
+            System.out.println("Introduzca la contraseña: ");
             ps.setString(2, sc.next());
-            System.out.println("Introduzca el nombre:");
+            System.out.println("Introduzca el nombre: ");
             ps.setString(3, sc.next());
-            System.out.println("Introduzca el email:");
+            System.out.println("Introduzca el email: ");
             ps.setString(4, sc.next());
 
             ps.executeUpdate();
+            System.out.println("Se ha insertado el usuario correctamente");
+            mostrarDatos(conexion);
+        } catch (Exception e) {
+            System.out.println("Se ha producido un error" + e.getMessage());
         }
 
     }
-    
-    private static void modificarAlumno(Connection conexion) throws SQLException {
-        String sql = "UPDATE alumnos SET nombre = ?, ciclo = ? WHERE id = ?";    
-       
-        PreparedStatement ps = conexion.prepareStatement(sql);
-       
+
+    private static void insertarUsuarios(Connection conexion) throws SQLException {
         Scanner sc = new Scanner(System.in).useDelimiter("\n");
-       
-        //Pedimos el id del alumno que queremos modificar
-        System.out.print("Id alumno a modificar: ");
-        int id = sc.nextInt();
-       
-        System.out.print("Introduzca el nuevo nombre del alumno: ");
-        String nuevoNombre = sc.next();
-        System.out.print("Introduzca el nuevo ciclo: ");
-        String nuevoCiclo = sc.next();
-       
-        ps.setString(1, nuevoNombre);
-        ps.setString(2, nuevoCiclo);
-        ps.setInt(3, id);
-       
-        ps.executeUpdate();
+        String sql = "INSERT INTO users (username, password, nombre, email) VALUES(?,?,?,?);";
+        try{
+            System.out.println("Introduzca el numero de usuarios que desea introducir: ");
+            int usuarios=sc.nextInt();
+            PreparedStatement ps = conexion.prepareStatement(sql);
+
+            for (int i = 0; i < usuarios; i++) {
+                System.out.println("Introduzca el nombre de usuario:");
+                ps.setString(1, sc.next());
+                System.out.println("Introduzca la contraseña:");
+                ps.setString(2, sc.next());
+                System.out.println("Introduzca el nombre:");
+                ps.setString(3, sc.next());
+                System.out.println("Introduzca el email:");
+                ps.setString(4, sc.next());
+
+                ps.executeUpdate();
+                System.out.println("Se ha insertado el usuario correctamente");
+            }
+            
+            mostrarDatos(conexion);
+        }catch (Exception e) {
+            System.out.println("Se ha producido un error" + e.getMessage());
+        }
+    }
+    
+    private static void modificarUsuario(Connection conexion) throws SQLException {
+        String sql = "UPDATE alumnos SET username = ?, password = ?, nombre = ?, email = ? WHERE user_id = ?";    
+        try{
+            PreparedStatement ps = conexion.prepareStatement(sql);
+
+            Scanner sc = new Scanner(System.in).useDelimiter("\n");
+
+            //Pedimos el id del alumno que queremos modificar
+            System.out.print("Id del usuario a modificar a modificar: ");
+            int id = sc.nextInt();
+
+            System.out.print("Introduzca el nuevo nombre usuario: ");
+            String nuevoUsuario = sc.next();
+            System.out.print("Introduzca la nueva contraseña: ");
+            String nuevaContraseña = sc.next();
+            System.out.print("Introduzca la nuevo nombre: ");
+            String nuevoNombre = sc.next();
+            System.out.print("Introduzca la nuevo email: ");
+            String nuevoEmail = sc.next();
+
+            ps.setString(1, nuevoUsuario);
+            ps.setString(2, nuevaContraseña);
+            ps.setString(3, nuevoNombre);
+            ps.setString(4, nuevoEmail);
+            ps.setInt(5, id);
+
+            ps.executeUpdate();
+            mostrarDatos(conexion);
+        }catch (Exception e) {
+            System.out.println("Se ha producido un error" + e.getMessage());
+        }
+    }
+    
+    private static void eliminarAlumno(Connection conexion) throws SQLException {
+        String sql = "DELETE FROM alumnos WHERE username = ?";
+        try{
+            PreparedStatement ps=conexion.prepareStatement(sql);
+
+            Scanner sc=new Scanner(System.in).useDelimiter("\n");
+            System.out.println("Introduce el id a borrar:");
+            ps.setString(1, sc.next());
+            
+            ps.executeUpdate();
+            mostrarDatos(conexion);
+        }catch (Exception e) {
+            System.out.println("Se ha producido un error" + e.getMessage());
+        }
+    }
+    
+    private static void cerrarConexion(Connection conexion) {
+        try {
+            if (conexion != null) {
+                conexion.close();
+                System.out.println("Conexion cerrada");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error al cerrar la conexion. " + ex.getMessage());
+        }
     }
 
 } //Fin de la clase Principal
